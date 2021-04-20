@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %} Signup {% endblock %}
+{% block content %}
+
+<div class="login-block text-center my-4">
+    <h1>Signup</h1>
+    <form action="{% url 'account:signup' %}" method="post" class="m-2">
+    {%csrf_token%}
+        {% for field in form %}
+            <label for="">{{field.label}}</label>
+            <div>{{field}}</div>
+            {% if field.errors%}
+                <p>{{field.errors}}</p>
+            {%endif%}
+        {%endfor%}
+    <input type="submit" class="btn btn-secondary my-3 me-3" value="Signup">
+    <p>{{ form.non_field_errors }}</p>
+    </form>
+</div>
+{% endblock %}

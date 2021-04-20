@@ -1,8 +1,11 @@
+import re
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 from .models import Post
 from .forms import NewCommentForm, NewPostForm
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def home_view(request):
@@ -52,7 +55,7 @@ def post_add_view(request):
         if post_form.is_valid():
             new_post = post_form.save(commit=False)
             new_post.author = request.user
-            new_post.slug = new_post.title.replace(' ', '-').lower()
+            new_post.slug = re.sub("[^A-Za-z0-9]", "", new_post.title).lower()
             new_post.save()
             return redirect('/' + new_post.slug)
     else:

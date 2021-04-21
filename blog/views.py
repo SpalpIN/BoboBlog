@@ -10,18 +10,15 @@ from .tasks import save_comment_task
 
 
 def home_view(request):
-
     all_posts = Post.objects.all()
-
     return render(request, 'index.html', {'posts': all_posts})
 
 
 def post_detail_view(request, post):
     post = get_object_or_404(Post, slug=post)
-
     allcomments = post.comments.all()
-    page = request.GET.get('page', 1)
 
+    page = request.GET.get('page', 1)
     paginator = Paginator(allcomments, 5)
     try:
         comments = paginator.page(page)

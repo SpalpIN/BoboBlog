@@ -1,11 +1,12 @@
 import re
 
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth.decorators import login_required
 
 from .models import Post
 from .forms import NewCommentForm, NewPostForm
+from .tasks import save_comment_task
 
 
 def home_view(request):
@@ -16,7 +17,6 @@ def home_view(request):
 
 
 def post_detail_view(request, post):
-
     post = get_object_or_404(Post, slug=post)
 
     allcomments = post.comments.all()
@@ -33,9 +33,8 @@ def post_detail_view(request, post):
     if request.method == 'POST':
         comment_form = NewCommentForm(request.POST)
         if comment_form.is_valid():
-            user_comment = comment_form.save(commit=False)
-            user_comment.post = post
-            user_comment.save()
+            form_data = request.POST.dict()
+            save_comment_task(form_data, post.id)
             return redirect('/' + post.slug)
     else:
         comment_form = NewCommentForm()
